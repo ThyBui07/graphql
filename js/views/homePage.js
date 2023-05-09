@@ -39,6 +39,13 @@ class homePage extends HTMLElement {
             amount
                 path
           }
+          skills: transaction(order_by: {createdAt: asc}, where: {
+              eventId: {_eq: 20}
+          }) {
+                  type
+              amount
+                  path
+            }
           xpJS: transaction(order_by: {createdAt: asc}, where: {
           type: {_eq: "xp"}
             eventId: {_eq: 37}
@@ -112,18 +119,77 @@ class homePage extends HTMLElement {
     }
     return xp_total;
   }
+  
+  logOut(event) {
+    event.preventDefault();
+    localStorage.removeItem('jwt');
+    console.log('JWT token removed from local storage.');
+    location.reload();
+  }
+
   connectedCallback() {
-    // console.log("connectedCallback run second");
     // this.render();
   }
   disconnectedCallback() {}
 
   render(data) {
-    this.innerHTML = `
-    <div class="container">
-        <div class="py-5 text-center">
+    const skills = [];
+    data.skills.forEach((skill) => {
+        if (skill.type.startsWith("skill_")) {
+          const existingSkill = skills.find((s) => s.skill === skill.type.slice(6));
+          if (existingSkill) {
+            existingSkill.amount += skill.amount;
+          } else {
+            skills.push({
+              skill: skill.type.slice(6),
+              amount: skill.amount,
+            });
+          }
+        }
+      });
+
+    const svgString = 
+    `
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+        <p class="lead">Skills</p>
+        <svg width="800" height="400">
+
+        </svg>
+    </div>
+    `;
+
+    // test
+    // Determine the maximum value of the data
+const maxAmount = Math.max(...skills.map(skill => skill.amount));
+
+// Define the dimensions of the bars
+const barWidth = 800 / skills.length;
+const barHeight = 400 / maxAmount;
+
+// Create a rectangle for each data point
+let rectString = '';
+skills.forEach((skill, index) => {
+  const x = index * barWidth;
+  const y = 400 - skill.amount * barHeight;
+  const width = barWidth;
+  const height = skill.amount * barHeight;
+  const fill = 'blue';
+  rectString += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${fill}"/>`;
+});
+
+// Append the rectangles to the SVG string
+const svgWithRectsString = svgString.replace('</svg>', rectString + '</svg>');
+
+console.log(svgWithRectsString);
+  
+    this.innerHTML = 
+    `<div class="container">`
+    + 
+    `<div class="py-5 text-center">
         <img class="mb-4" src="./favicon_io/android-chrome-512x512.png" alt="" width="72" height="72">
         <h2>Welcome, ${data.user[0].firstName} ${data.user[0].lastName}!</h2>
+        <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="submit">Log Out</button>
+
         </div>
 
         <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
@@ -133,7 +199,7 @@ class homePage extends HTMLElement {
                   data.user[0].login
                 }</p>
                 <p class="lead font-weight-normal">Audit Ratio: ${
-                  data.user[0].auditRatio
+                  Number(data.user[0].auditRatio.toFixed(1))
                 }</p>
                 <p class="lead font-weight-normal">Total XP: ${Math.round(
                   data.xpTotal.aggregate.sum.amount / 1000
@@ -142,35 +208,33 @@ class homePage extends HTMLElement {
         </div>
 
         <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
-            <div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
-            <div class="bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
-                <div class="my-3 py-3">
-                    <h2 class="display-5">Another headline</h2>
-                    <p class="lead">And an even wittier subheading.</p>
+            <div class="row">
+                <div class="col bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+                    <p class="lead">Audits Ratio</p>
+            
                     <svg width="400" height="150">
-                        <rect x="50" y="25" width="220" height="50" fill="#0074D9"/>
-                        <text x="10" y="45" fill="#FFFFFF" font-size="14">Done</text>
-                        <text x="285" y="45" fill="#FFFFFF" font-size="14">552 kB</text>
-                        <rect x="50" y="75" width="220" height="10" fill="#353A35"/>
-                        <rect x="50" y="85" width="300" height="50" fill="#FF4136"/>
-                        <text x="-10" y="95" fill="#FFFFFF" font-size="14">Received</text>
-                        <text x="355" y="95" fill="#FFFFFF" font-size="14">764 kB</text>
-                        </svg>
+                    <!-- Done bar -->
+                    <rect x="0" y="25" width="${Math.round(data.user[0].totalUp/10000)}" height="50" fill="#0074D9"/>
+                    <text x="0" y="20" fill="#FFFFFF" font-size="14">Done: </text>
+                    <text x="50" y="20" fill="#FFFFFF" font-size="14">${Math.round(data.user[0].totalUp/1000)} kB</text>
+
+                    <rect x="50" y="75" width="220" height="10" fill="#353A35"/>
+
+                    <!-- Received bar -->
+                    <rect x="0" y="105" width="${Math.round(data.user[0].totalDown/10000)}" height="50" fill="#FF4136"/>
+                    <text x="0" y="100" fill="#FFFFFF" font-size="14">Received: </text>
+                    <text x="70" y="100" fill="#FFFFFF" font-size="14">${Math.round(data.user[0].totalDown/1000)} kB</text>
+                    </svg>
+                    <h3 class="display-4">${Number(data.user[0].auditRatio.toFixed(1))}</h3>
+
+                </div>
+                <div class="col">
+                2 of 2
                 </div>
             </div>
-            <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
-            <div class="my-3 p-3">
-                <h2 class="display-5">Another headline</h2>
-                <p class="lead">And an even wittier subheading.</p>
-            </div>
-            <div class="bg-dark box-shadow mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-            </div>
-        </div>
-
-        
-
-  </div>
-        `;
+    </div>`
+    + svgWithRectsString +
+    `</div>`;
   }
 }
 
