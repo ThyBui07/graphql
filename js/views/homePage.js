@@ -119,9 +119,19 @@ class homePage extends HTMLElement {
     }
     return xp_total;
   }
+
+  randomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
   
   logOut(event) {
-    event.preventDefault();
+    // event.preventDefault();
+    console.log('Log out button clicked.')
     localStorage.removeItem('jwt');
     console.log('JWT token removed from local storage.');
     location.reload();
@@ -129,6 +139,7 @@ class homePage extends HTMLElement {
 
   connectedCallback() {
     // this.render();
+    this.addEventListener("click", this.logOut);
   }
   disconnectedCallback() {}
 
@@ -148,39 +159,48 @@ class homePage extends HTMLElement {
         }
       });
 
-    const svgString = 
-    `
-    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
-        <p class="lead">Skills</p>
-        <svg width="800" height="400">
-
-        </svg>
-    </div>
-    `;
+      const svgString = `
+      <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
+          <p class="lead text-white">Skills</p>
+          <svg width="800" height="400">
+           </svg>
+      </div>
+  `;
 
     // test
     // Determine the maximum value of the data
-const maxAmount = Math.max(...skills.map(skill => skill.amount));
+    const maxAmount = Math.max(...skills.map(skill => skill.amount));
 
-// Define the dimensions of the bars
-const barWidth = 800 / skills.length;
-const barHeight = 400 / maxAmount;
+    // Define the dimensions of the bars
+    const barWidth = 800 / skills.length;
+    const barHeight = 400 / maxAmount;
 
-// Create a rectangle for each data point
+// Create a rectangle and text for each data point
 let rectString = '';
 skills.forEach((skill, index) => {
   const x = index * barWidth;
-  const y = 400 - skill.amount * barHeight;
+  const y = 370 - skill.amount * barHeight;
+  console.log('x', x);
+  console.log('y', y);
+
   const width = barWidth;
   const height = skill.amount * barHeight;
-  const fill = 'blue';
-  rectString += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${fill}"/>`;
-});
+  // const fill = this.randomColor();
+  rectString += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="#0074D9"/>`;
+  const textSkillX = x + barWidth / 2;
+  rectString += `<text x="${textSkillX}" y="390" fill="white" text-anchor="middle">${skill.skill.replace('-', '')}</text>`;
 
-// Append the rectangles to the SVG string
-const svgWithRectsString = svgString.replace('</svg>', rectString + '</svg>');
+  const textAmountX = x + barWidth / 2;
+  const textAmountY = y + height / 2;
+  
+  rectString += `<text x="${textAmountX}" y="${textAmountY}" fill="white" text-anchor="middle">${skill.amount}</text>`;
+})
 
-console.log(svgWithRectsString);
+
+    // Append the rectangles to the SVG string
+    const svgWithRectsString = svgString.replace('</svg>', rectString + '</svg>');
+
+    console.log(svgWithRectsString);
   
     this.innerHTML = 
     `<div class="container">`
@@ -188,7 +208,7 @@ console.log(svgWithRectsString);
     `<div class="py-5 text-center">
         <img class="mb-4" src="./favicon_io/android-chrome-512x512.png" alt="" width="72" height="72">
         <h2>Welcome, ${data.user[0].firstName} ${data.user[0].lastName}!</h2>
-        <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="submit">Log Out</button>
+        <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
 
         </div>
 
@@ -207,10 +227,10 @@ console.log(svgWithRectsString);
             </div>
         </div>
 
-        <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
-            <div class="row">
-                <div class="col bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
-                    <p class="lead">Audits Ratio</p>
+        <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
+            
+                
+                    <p class="lead text-white">Audits Ratio</p>
             
                     <svg width="400" height="150">
                     <!-- Done bar -->
@@ -225,13 +245,11 @@ console.log(svgWithRectsString);
                     <text x="0" y="100" fill="#FFFFFF" font-size="14">Received: </text>
                     <text x="70" y="100" fill="#FFFFFF" font-size="14">${Math.round(data.user[0].totalDown/1000)} kB</text>
                     </svg>
-                    <h3 class="display-4">${Number(data.user[0].auditRatio.toFixed(1))}</h3>
+                    <h3 class="display-4 text-white">${Number(data.user[0].auditRatio.toFixed(1))}</h3>
 
-                </div>
-                <div class="col">
-                2 of 2
-                </div>
-            </div>
+             
+                
+            
     </div>`
     + svgWithRectsString +
     `</div>`;
