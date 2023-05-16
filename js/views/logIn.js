@@ -22,7 +22,10 @@ class logIn extends HTMLElement {
             localStorage.setItem('jwt', data);
             location.reload();
         } else {
-            throw new Error('HTTP status code: ' + response.status);
+            console.log(response.status);
+            let alert = document.getElementById('alert-response')
+            alert.innerText = response.status
+            alert.classList.remove('hide')
         }
     }
     catch (error) {
@@ -43,6 +46,9 @@ class logIn extends HTMLElement {
       <label for="inputEmail" class="sr-only">Email address or username</label>
       <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>
+      <div id="alert-response" class="alert alert-danger hide" role="alert">
+        This is a danger alert—check it out!
+      </div>
       <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
       <p class="mt-5 mb-3 text-muted">&copy; 2022-2023</p>
