@@ -5,41 +5,39 @@ class logIn extends HTMLElement {
 
   async logIn(event) {
     event.preventDefault();
-    const email = document.getElementById('inputEmail').value;
-    const password = document.getElementById('inputPassword').value;
+    const email = document.getElementById("inputEmail").value;
+    const password = document.getElementById("inputPassword").value;
     const headers = new Headers();
-    headers.append('Authorization', 'Basic ' + btoa(email + ':' + password));
-    headers.append('Content-Type', 'application/json');
+    headers.append("Authorization", "Basic " + btoa(email + ":" + password));
+    headers.append("Content-Type", "application/json");
     try {
-        const response = await fetch('https://01.gritlab.ax/api/auth/signin', {
-            method: 'POST',
-            headers: headers,
-        })
+      const response = await fetch("https://01.gritlab.ax/api/auth/signin", {
+        method: "POST",
+        headers: headers,
+      });
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-            localStorage.setItem('jwt', data);
-            location.reload();
-        } else {
-            console.log(response.status);
-            let alert = document.getElementById('alert-response')
-            alert.innerText = response.status
-            alert.classList.remove('hide')
-        }
-    }
-    catch (error) {
-        console.log(error);
+      if (response.ok) {
+        const data = await response.json();
+
+        localStorage.setItem("jwt", data);
+        location.reload();
+      } else {
+        let alert = document.getElementById("alert-response");
+        alert.innerText = "Error: User does not exist or password incorrect";
+        alert.classList.remove("d-none");
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
-    connectedCallback() {
-        this.render();
-        this.addEventListener('submit', this.logIn);
-    };
-    disconnectedCallback() {};
+  connectedCallback() {
+    this.render();
+    this.addEventListener("submit", this.logIn);
+  }
+  disconnectedCallback() {}
 
-    render() {
-        this.innerHTML = `
+  render() {
+    this.innerHTML = `
         <form novalidate="novalidate" class="form-signin">
       <img class="mb-4" src="./favicon_io/favicon-32x32.png" alt="" width="72" height="72">
       <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
@@ -53,9 +51,8 @@ class logIn extends HTMLElement {
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
       <p class="mt-5 mb-3 text-muted">&copy; 2022-2023</p>
     </form>
-        `
-    }
-
+        `;
+  }
 }
 
-customElements.define('log-in', logIn);
+customElements.define("log-in", logIn);

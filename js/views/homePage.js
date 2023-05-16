@@ -1,7 +1,6 @@
 class homePage extends HTMLElement {
   constructor() {
     super();
-    console.log("super run first");
     this.loadUserData();
   }
 
@@ -9,8 +8,6 @@ class homePage extends HTMLElement {
     const jwt = localStorage.getItem("jwt");
     const decodedJwt = this.decodeJwt(jwt);
     const response = await this.getQuery(decodedJwt.sub, jwt);
-    console.log("this is res", response);
-
     this.render(response.data);
   }
 
@@ -100,7 +97,6 @@ class homePage extends HTMLElement {
     return data;
   }
   catch(error) {
-    console.log(error);
     throw new Error("Failed to fetch data from GraphQL API");
   }
 
@@ -121,24 +117,20 @@ class homePage extends HTMLElement {
   }
 
   randomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
+    const letters = "0123456789ABCDEF";
+    let color = "#";
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-  };
-  
+  }
+
   logOut(event) {
-    // event.preventDefault();
-    console.log('Log out button clicked.')
-    localStorage.removeItem('jwt');
-    console.log('JWT token removed from local storage.');
+    localStorage.removeItem("jwt");
     location.reload();
   }
 
   connectedCallback() {
-    // this.render();
     this.addEventListener("click", this.logOut);
   }
   disconnectedCallback() {}
@@ -146,20 +138,22 @@ class homePage extends HTMLElement {
   render(data) {
     const skills = [];
     data.skills.forEach((skill) => {
-        if (skill.type.startsWith("skill_")) {
-          const existingSkill = skills.find((s) => s.skill === skill.type.slice(6));
-          if (existingSkill) {
-            existingSkill.amount += skill.amount;
-          } else {
-            skills.push({
-              skill: skill.type.slice(6),
-              amount: skill.amount,
-            });
-          }
+      if (skill.type.startsWith("skill_")) {
+        const existingSkill = skills.find(
+          (s) => s.skill === skill.type.slice(6)
+        );
+        if (existingSkill) {
+          existingSkill.amount += skill.amount;
+        } else {
+          skills.push({
+            skill: skill.type.slice(6),
+            amount: skill.amount,
+          });
         }
-      });
+      }
+    });
 
-      const svgString = `
+    const svgString = `
       <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
           <p class="lead text-white">Skills</p>
           <svg width="800" height="400">
@@ -169,43 +163,43 @@ class homePage extends HTMLElement {
 
     // test
     // Determine the maximum value of the data
-    const maxAmount = Math.max(...skills.map(skill => skill.amount));
+    const maxAmount = Math.max(...skills.map((skill) => skill.amount));
 
     // Define the dimensions of the bars
     const barWidth = 800 / skills.length;
     const barHeight = 400 / maxAmount;
 
-// Create a rectangle and text for each data point
-let rectString = '';
-skills.forEach((skill, index) => {
-  const x = index * barWidth;
-  const y = 370 - skill.amount * barHeight;
-  console.log('x', x);
-  console.log('y', y);
+    // Create a rectangle and text for each data point
+    let rectString = "";
+    skills.forEach((skill, index) => {
+      const x = index * barWidth;
+      const y = 370 - skill.amount * barHeight;
 
-  const width = barWidth;
-  const height = skill.amount * barHeight;
-  // const fill = this.randomColor();
-  rectString += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="#0074D9"/>`;
-  const textSkillX = x + barWidth / 2;
-  rectString += `<text x="${textSkillX}" y="390" fill="white" text-anchor="middle">${skill.skill.replace('-', '')}</text>`;
+      const width = barWidth;
+      const height = skill.amount * barHeight;
+      // const fill = this.randomColor();
+      rectString += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="#0074D9"/>`;
+      const textSkillX = x + barWidth / 2;
+      rectString += `<text x="${textSkillX}" y="390" fill="white" text-anchor="middle">${skill.skill.replace(
+        "-",
+        ""
+      )}</text>`;
 
-  const textAmountX = x + barWidth / 2;
-  const textAmountY = y + height / 2;
-  
-  rectString += `<text x="${textAmountX}" y="${textAmountY}" fill="white" text-anchor="middle">${skill.amount}</text>`;
-})
+      const textAmountX = x + barWidth / 2;
+      const textAmountY = y + height / 2;
 
+      rectString += `<text x="${textAmountX}" y="${textAmountY}" fill="white" text-anchor="middle">${skill.amount}</text>`;
+    });
 
     // Append the rectangles to the SVG string
-    const svgWithRectsString = svgString.replace('</svg>', rectString + '</svg>');
+    const svgWithRectsString = svgString.replace(
+      "</svg>",
+      rectString + "</svg>"
+    );
 
-    console.log(svgWithRectsString);
-  
-    this.innerHTML = 
-    `<div class="container">`
-    + 
-    `<div class="py-5 text-center">
+    this.innerHTML =
+      `<div class="container">` +
+      `<div class="py-5 text-center">
         <img class="mb-4" src="./favicon_io/android-chrome-512x512.png" alt="" width="72" height="72">
         <h2>Welcome, ${data.user[0].firstName} ${data.user[0].lastName}!</h2>
         <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
@@ -218,9 +212,9 @@ skills.forEach((skill, index) => {
                 <p class="lead font-weight-normal">Username: ${
                   data.user[0].login
                 }</p>
-                <p class="lead font-weight-normal">Audit Ratio: ${
-                  Number(data.user[0].auditRatio.toFixed(1))
-                }</p>
+                <p class="lead font-weight-normal">Audit Ratio: ${Number(
+                  data.user[0].auditRatio.toFixed(1)
+                )}</p>
                 <p class="lead font-weight-normal">Total XP: ${Math.round(
                   data.xpTotal.aggregate.sum.amount / 1000
                 )} kB</p>
@@ -234,25 +228,35 @@ skills.forEach((skill, index) => {
             
                     <svg width="400" height="150">
                     <!-- Done bar -->
-                    <rect x="0" y="25" width="${Math.round(data.user[0].totalUp/10000)}" height="50" fill="#0074D9"/>
+                    <rect x="0" y="25" width="${Math.round(
+                      data.user[0].totalUp / 10000
+                    )}" height="50" fill="#0074D9"/>
                     <text x="0" y="20" fill="#FFFFFF" font-size="14">Done: </text>
-                    <text x="50" y="20" fill="#FFFFFF" font-size="14">${Math.round(data.user[0].totalUp/1000)} kB</text>
+                    <text x="50" y="20" fill="#FFFFFF" font-size="14">${Math.round(
+                      data.user[0].totalUp / 1000
+                    )} kB</text>
 
                     <rect x="50" y="75" width="220" height="10" fill="#353A35"/>
 
                     <!-- Received bar -->
-                    <rect x="0" y="105" width="${Math.round(data.user[0].totalDown/10000)}" height="50" fill="#FF4136"/>
+                    <rect x="0" y="105" width="${Math.round(
+                      data.user[0].totalDown / 10000
+                    )}" height="50" fill="#FF4136"/>
                     <text x="0" y="100" fill="#FFFFFF" font-size="14">Received: </text>
-                    <text x="70" y="100" fill="#FFFFFF" font-size="14">${Math.round(data.user[0].totalDown/1000)} kB</text>
+                    <text x="70" y="100" fill="#FFFFFF" font-size="14">${Math.round(
+                      data.user[0].totalDown / 1000
+                    )} kB</text>
                     </svg>
-                    <h3 class="display-4 text-white">${Number(data.user[0].auditRatio.toFixed(1))}</h3>
+                    <h3 class="display-4 text-white">${Number(
+                      data.user[0].auditRatio.toFixed(1)
+                    )}</h3>
 
              
                 
             
-    </div>`
-    + svgWithRectsString +
-    `</div>`;
+    </div>` +
+      svgWithRectsString +
+      `</div>`;
   }
 }
 
