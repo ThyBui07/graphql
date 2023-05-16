@@ -1,6 +1,6 @@
 console.log('router.js loaded');
 const urlRoutes = {
-    '/': {
+    '/graphql/': {
         template: "<home-page></home-page>"
     },
     '/login': {
@@ -23,7 +23,7 @@ const urlLocationHolder = async () => {
 
     var jwt = localStorage.getItem('jwt');
 
-    if (jwt == null && location == '/') {
+    if (jwt == null && location == '/graphql/') {
         location = '/login';
     };
 
