@@ -18,14 +18,15 @@ const urlRoute = (path) => {
 };
 
 const urlLocationHolder = async () => {
-    const location = window.location.pathname;
+    let location = window.location.pathname;
     console.log(location)
 
     const jwt = localStorage.getItem('jwt');
-
+    console.log(jwt)
     if (jwt == null && location == '/graphql/') {
         location = '/login';
     };
+    console.log(location)
 
     const route = urlRoutes[location];
     const htmml = route.template;
