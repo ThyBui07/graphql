@@ -23,8 +23,9 @@ class logIn extends HTMLElement {
         location.reload();
       } else {
         let alert = document.getElementById("alert-response");
+        alert.classList.add("alert");
+        alert.classList.add("alert-danger");
         alert.innerText = "Error: User does not exist or password incorrect";
-        alert.classList.remove("d-none");
       }
     } catch (error) {
       console.log(error);
@@ -44,8 +45,7 @@ class logIn extends HTMLElement {
       <label for="inputEmail" class="sr-only">Email address or username</label>
       <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>
-      <div id="alert-response" class="alert alert-danger hide" role="alert">
-        This is a danger alert—check it out!
+      <div id="alert-response">
       </div>
       <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
