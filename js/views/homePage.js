@@ -1,3 +1,5 @@
+
+
 class homePage extends HTMLElement {
   constructor() {
     super();
@@ -7,9 +9,12 @@ class homePage extends HTMLElement {
   async loadUserData() {
     const jwt = localStorage.getItem("jwt");
     const decodedJwt = this.decodeJwt(jwt);
-    const response = await this.getQuery(decodedJwt.sub, jwt);
+    let response;
+    response = await this.getQuery(decodedJwt.sub, jwt);
+    localStorage.setItem("skills,", JSON.stringify(response.skills));
     this.render(response.data);
   }
+
 
   async getQuery(id, jwt) {
     const query = `
@@ -130,133 +135,74 @@ class homePage extends HTMLElement {
     location.reload();
   }
 
+  
+
   connectedCallback() {
     this.addEventListener("click", this.logOut);
   }
   disconnectedCallback() {}
 
   render(data) {
-    const skills = [];
-    data.skills.forEach((skill) => {
-      if (skill.type.startsWith("skill_")) {
-        const existingSkill = skills.find(
-          (s) => s.skill === skill.type.slice(6)
-        );
-        if (existingSkill) {
-          existingSkill.amount += skill.amount;
-        } else {
-          skills.push({
-            skill: skill.type.slice(6),
-            amount: skill.amount,
-          });
-        }
-      }
-    });
+  this.innerHTML =
+    `<div class="container">
+    <div class="py-5 text-center">
+      <img class="mb-4" src="./favicon_io/android-chrome-512x512.png" alt="" width="72" height="72">
+      <h2>Welcome, ${data.user[0].firstName} ${data.user[0].lastName}!</h2>
+      <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
 
-    const svgString = `
-      <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
-          <p class="lead text-white">Skills</p>
-          <svg width="800" height="400">
-           </svg>
       </div>
-  `;
 
-    // test
-    // Determine the maximum value of the data
-    const maxAmount = Math.max(...skills.map((skill) => skill.amount));
+      <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+          <div class="col-md-7 p-lg-5 mx-auto my-1">
+              <h1 class="display-5 font-weight-normal">Basic Information</h1>
+              <p class="lead font-weight-normal">Username: ${
+                data.user[0].login
+              }</p>
+              <p class="lead font-weight-normal">Audit Ratio: ${Number(
+                data.user[0].auditRatio.toFixed(1)
+              )}</p>
+              <p class="lead font-weight-normal">Total XP: ${Math.round(
+                data.xpTotal.aggregate.sum.amount / 1000
+              )} kB</p>
+          </div>
+      </div>
 
-    // Define the dimensions of the bars
-    const barWidth = 800 / skills.length;
-    const barHeight = 400 / maxAmount;
+      <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
+          
+              
+                  <p class="lead text-white">Audits Ratio</p>
+          
+                  <svg width="400" height="150">
+                  <!-- Done bar -->
+                  <rect x="0" y="25" width="${Math.round(
+                    data.user[0].totalUp / 10000
+                  )}" height="50" fill="#0074D9"/>
+                  <text x="0" y="20" fill="#FFFFFF" font-size="14">Done: </text>
+                  <text x="50" y="20" fill="#FFFFFF" font-size="14">${Math.round(
+                    data.user[0].totalUp / 1000
+                  )} kB</text>
 
-    // Create a rectangle and text for each data point
-    let rectString = "";
-    skills.forEach((skill, index) => {
-      const x = index * barWidth;
-      const y = 370 - skill.amount * barHeight;
+                  <rect x="50" y="75" width="220" height="10" fill="#353A35"/>
 
-      const width = barWidth;
-      const height = skill.amount * barHeight;
-      // const fill = this.randomColor();
-      rectString += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="#0074D9"/>`;
-      const textSkillX = x + barWidth / 2;
-      rectString += `<text x="${textSkillX}" y="390" fill="white" text-anchor="middle">${skill.skill.replace(
-        "-",
-        ""
-      )}</text>`;
+                  <!-- Received bar -->
+                  <rect x="0" y="105" width="${Math.round(
+                    data.user[0].totalDown / 10000
+                  )}" height="50" fill="#FF4136"/>
+                  <text x="0" y="100" fill="#FFFFFF" font-size="14">Received: </text>
+                  <text x="70" y="100" fill="#FFFFFF" font-size="14">${Math.round(
+                    data.user[0].totalDown / 1000
+                  )} kB</text>
+                  </svg>
+                  <h3 class="display-4 text-white">${Number(
+                    data.user[0].auditRatio.toFixed(1)
+                  )}</h3>
 
-      const textAmountX = x + barWidth / 2;
-      const textAmountY = y + height / 2;
-
-      rectString += `<text x="${textAmountX}" y="${textAmountY}" fill="white" text-anchor="middle">${skill.amount}</text>`;
-    });
-
-    // Append the rectangles to the SVG string
-    const svgWithRectsString = svgString.replace(
-      "</svg>",
-      rectString + "</svg>"
-    );
-
-    this.innerHTML =
-      `<div class="container">` +
-      `<div class="py-5 text-center">
-        <img class="mb-4" src="./favicon_io/android-chrome-512x512.png" alt="" width="72" height="72">
-        <h2>Welcome, ${data.user[0].firstName} ${data.user[0].lastName}!</h2>
-        <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
-
-        </div>
-
-        <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
-            <div class="col-md-7 p-lg-5 mx-auto my-1">
-                <h1 class="display-5 font-weight-normal">Basic Information</h1>
-                <p class="lead font-weight-normal">Username: ${
-                  data.user[0].login
-                }</p>
-                <p class="lead font-weight-normal">Audit Ratio: ${Number(
-                  data.user[0].auditRatio.toFixed(1)
-                )}</p>
-                <p class="lead font-weight-normal">Total XP: ${Math.round(
-                  data.xpTotal.aggregate.sum.amount / 1000
-                )} kB</p>
-            </div>
-        </div>
-
-        <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
             
-                
-                    <p class="lead text-white">Audits Ratio</p>
-            
-                    <svg width="400" height="150">
-                    <!-- Done bar -->
-                    <rect x="0" y="25" width="${Math.round(
-                      data.user[0].totalUp / 10000
-                    )}" height="50" fill="#0074D9"/>
-                    <text x="0" y="20" fill="#FFFFFF" font-size="14">Done: </text>
-                    <text x="50" y="20" fill="#FFFFFF" font-size="14">${Math.round(
-                      data.user[0].totalUp / 1000
-                    )} kB</text>
-
-                    <rect x="50" y="75" width="220" height="10" fill="#353A35"/>
-
-                    <!-- Received bar -->
-                    <rect x="0" y="105" width="${Math.round(
-                      data.user[0].totalDown / 10000
-                    )}" height="50" fill="#FF4136"/>
-                    <text x="0" y="100" fill="#FFFFFF" font-size="14">Received: </text>
-                    <text x="70" y="100" fill="#FFFFFF" font-size="14">${Math.round(
-                      data.user[0].totalDown / 1000
-                    )} kB</text>
-                    </svg>
-                    <h3 class="display-4 text-white">${Number(
-                      data.user[0].auditRatio.toFixed(1)
-                    )}</h3>
-
-             
-                
-            
-    </div>` +
-      svgWithRectsString +
-      `</div>`;
+              
+          
+  </div>
+  
+    </div>`;
   }
 }
 

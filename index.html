@@ -41,11 +41,14 @@
     <!-- Custom styles for this template -->
     <link href="./css/main.css" rel="stylesheet" />
     <link href="./css/signin.css" rel="stylesheet" />
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
   </head>
   <body>
-    <div id="main" class="text-center">
-      <div id="chart"></div>
+    <div  class="text-center">
+      <div id="main"></div>
+      <div id="pie-chart" style="margin-left: 30px"></div>
     </div>
+
     
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -65,7 +68,7 @@
       crossorigin="anonymous"
     ></script>
     <!-- frappe chart -->
-    <script src="https://unpkg.com/frappe-charts@1.2.4/dist/frappe-charts.min.iife.js"></script>
+    
     <!-- global variables -->
     <!-- <script type="module" src="./js/router.js"></script> -->
     <script type="module" src="./js/script.js"></script>
@@ -73,31 +76,5 @@
     <!-- views -->
     <script type="module" src="./js/views/logIn.js"></script>
     <script type="module" src="./js/views/homePage.js"></script>
-
-    <script>
-      const data = {
-    labels: ["12am-3am", "3am-6pm", "6am-9am", "9am-12am",
-        "12pm-3pm", "3pm-6pm", "6pm-9pm", "9am-12am"
-    ],
-    datasets: [
-        {
-            name: "Some Data", type: "bar",
-            values: [25, 40, 30, 35, 8, 52, 17, -4]
-        },
-        {
-            name: "Another Set", type: "line",
-            values: [25, 50, -10, 15, 18, 32, 27, 14]
-        }
-    ]
-}
-console.log(data)
-const chart = new frappe.Chart("#chart", {
-    title: "My Awesome Chart",
-    data: data,
-    type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
-    height: 250,
-    colors: ['#7cd6fd', '#743ee2']
-})
-    </script>
   </body>
 </html>
