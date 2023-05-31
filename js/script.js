@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const homePageElement = document.createElement("home-page");
       mainDiv.appendChild(homePageElement);
       if (localStorage.getItem("skills") != undefined) {
+        chart.style.display = "none";
         const technicalSkills = getTechnicalSkills(JSON.parse(localStorage.getItem("skills")))
       const data = [
         {
@@ -35,8 +36,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         height: 400,
         width: 500
       };
-      
-      Plotly.newPlot('pie-chart', data, layout);
+      let img_jpg = document.getElementById('jpg-export');
+      Plotly.newPlot('pie-chart', data, layout).then(
+        function(gd)
+         {
+          Plotly.toImage(gd,{height:400,width:500})
+             .then(
+                 function(url)
+             {
+                 img_jpg.src = url;
+             }
+             )
+        });
       }
     }
   });
