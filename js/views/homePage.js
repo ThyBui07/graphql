@@ -11,7 +11,7 @@ class homePage extends HTMLElement {
     const decodedJwt = this.decodeJwt(jwt);
     let response;
     response = await this.getQuery(decodedJwt.sub, jwt);
-    localStorage.setItem("skills,", JSON.stringify(response.skills));
+    localStorage.setItem("skills", JSON.stringify(response.data.skills));
     this.render(response.data);
   }
 
