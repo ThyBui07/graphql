@@ -144,17 +144,13 @@ class homePage extends HTMLElement {
 
   render(data) {
   this.innerHTML =
-    `<div class="container">
-    <div class="py-5 text-center">
-      <img class="mb-4" src="./favicon_io/android-chrome-512x512.png" alt="" width="72" height="72">
-      <h2>Welcome, ${data.user[0].firstName} ${data.user[0].lastName}!</h2>
-      <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
-
-      </div>
-
+    `<div class="container"
       <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
           <div class="col-md-7 p-lg-5 mx-auto my-1">
               <h1 class="display-5 font-weight-normal">Basic Information</h1>
+              <p class="lead font-weight-normal">Name: 
+                ${data.user[0].firstName} ${data.user[0].lastName}
+              </p>
               <p class="lead font-weight-normal">Username: ${
                 data.user[0].login
               }</p>
@@ -165,6 +161,7 @@ class homePage extends HTMLElement {
                 data.xpTotal.aggregate.sum.amount / 1000
               )} kB</p>
           </div>
+          <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
       </div>
 
       <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">

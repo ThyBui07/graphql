@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         width: 500
       };
       let img_jpg = document.getElementById('jpg-export');
-      Plotly.newPlot('pie-chart', data, layout).then(
+      console.log(img_jpg);
+      Plotly.newPlot('pie-chart', data, layout, { staticPlot: true }).then(
         function(gd)
          {
           Plotly.toImage(gd,{height:400,width:500})
