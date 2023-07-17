@@ -168,7 +168,7 @@ class homePage extends HTMLElement {
                 data.xpTotal.aggregate.sum.amount / 1000
               )} kB</p>
           </div>
-          <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block" type="button">Log Out</button>
+          <button id="logout-btn" class="btn btn-lg w-25 mx-auto btn-primary btn-block">Log Out</button>
       </div>
 
       <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark">
